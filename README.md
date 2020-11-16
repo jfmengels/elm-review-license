@@ -5,7 +5,7 @@ Provides an [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-r
 
 ## Provided rules
 
-- [`NoUnapprovedLicense`](https://package.elm-lang.org/packages/jfmengels/elm-review-license/1.0.0/NoUnapprovedLicense) - Reports dependencies with unapproved licenses.
+- [`NoUnapprovedLicense`](https://package.elm-lang.org/packages/jfmengels/elm-review-license/1.0.1/NoUnapprovedLicense) - Reports dependencies with unapproved licenses.
 
 
 ## Configuration
