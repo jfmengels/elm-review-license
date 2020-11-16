@@ -19,6 +19,9 @@ import Review.Rule exposing (Rule)
 config : List Rule
 config =
     [ NoUnapprovedLicense.rule
+        { allowed = [ "BSD-3-Clause", "MIT" ]
+        , forbidden = [ "GPL-3.0-only", "GPL-3.0-or-later" ]
+        }
     ]
 ```
 
