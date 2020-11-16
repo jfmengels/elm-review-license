@@ -1,11 +1,11 @@
 # elm-review-license
 
-Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) rules to REPLACEME.
+Provides an [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) rule to make sure you don't use packages with unapproved licenses.
 
 
 ## Provided rules
 
-- [`NoUnapprovedLicense`](https://package.elm-lang.org/packages/jfmengels/elm-review-license/1.0.0/NoUnapprovedLicense) - Reports REPLACEME.
+- [`NoUnapprovedLicense`](https://package.elm-lang.org/packages/jfmengels/elm-review-license/1.0.0/NoUnapprovedLicense) - Reports dependencies with unapproved licenses.
 
 
 ## Configuration
