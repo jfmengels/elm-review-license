@@ -24,6 +24,11 @@ import Set exposing (Set)
             }
         ]
 
+If the license of a dependency is in the `allowed` list, the dependency will not be reported.
+If it's in the `forbidden`, the dependency will be reported as an error.
+If it's in neither, the dependency will be reported but with a different message asking you
+to add the license to either list.
+
 -}
 rule : { allowed : List String, forbidden : List String } -> Rule
 rule configuration =
