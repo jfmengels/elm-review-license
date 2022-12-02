@@ -10,6 +10,7 @@ import Dict exposing (Dict)
 import Elm.License
 import Elm.Project
 import Elm.Syntax.Range exposing (Range)
+import Json.Encode as Encode
 import Review.Project.Dependency as Dependency exposing (Dependency)
 import Review.Rule as Rule exposing (Error, Rule)
 import Set exposing (Set)
@@ -36,6 +37,7 @@ rule configuration =
         |> Rule.withElmJsonProjectVisitor elmJsonVisitor
         |> Rule.withDependenciesProjectVisitor dependenciesVisitor
         |> Rule.withFinalProjectEvaluation (finalEvaluationForProject configuration)
+        |> Rule.withDataExtractor dataExtractor
         |> Rule.fromProjectRuleSchema
 
 
@@ -147,6 +149,16 @@ finalEvaluationForProject configuration projectContext =
 
         Nothing ->
             []
+
+
+dataExtractor : ProjectContext -> Encode.Value
+dataExtractor projectContext =
+    Dict.foldl
+        (\_ license acc -> Set.insert license acc)
+        Set.empty
+        projectContext.licenses
+        |> Set.toList
+        |> Encode.list Encode.string
 
 
 findPackageNameInElmJson : String -> String -> Range
