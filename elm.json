@@ -3,7 +3,7 @@
     "name": "jfmengels/elm-review-license",
     "summary": "Provides an elm-review rule to prevent using packages with unapproved licenses",
     "license": "BSD-3-Clause",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "exposed-modules": [
         "NoUnapprovedLicense"
     ],
