@@ -153,12 +153,7 @@ finalEvaluationForProject configuration projectContext =
 
 dataExtractor : ProjectContext -> Encode.Value
 dataExtractor projectContext =
-    Dict.foldl
-        (\_ license acc -> Set.insert license acc)
-        Set.empty
-        projectContext.licenses
-        |> Set.toList
-        |> Encode.list Encode.string
+    Encode.dict identity Encode.string projectContext.licenses
 
 
 findPackageNameInElmJson : String -> String -> Range

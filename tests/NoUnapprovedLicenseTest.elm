@@ -113,12 +113,18 @@ all =
             \() ->
                 sourceCode
                     |> Review.Test.run (rule { allowed = [], forbidden = [] })
-                    |> Review.Test.expectDataExtract """["BSD-3-Clause"]"""
+                    |> Review.Test.expectDataExtract """
+{
+  "elm/core": "BSD-3-Clause"
+}"""
         , test "should not report anything if all dependencies have a license that is allowed" <|
             \() ->
                 sourceCode
                     |> Review.Test.runWithProjectData (createProject "MIT") (rule { allowed = [ "MIT" ], forbidden = [] })
-                    |> Review.Test.expectDataExtract """["MIT"]"""
+                    |> Review.Test.expectDataExtract """
+{
+  "author/dependency": "MIT"
+}"""
         , test "should report an error if a dependency has an unknown license" <|
             \() ->
                 sourceCode
@@ -134,7 +140,10 @@ all =
                                 , under = "author/dependency"
                                 }
                             ]
-                        , Review.Test.dataExtract """["BSD-3-Clause"]"""
+                        , Review.Test.dataExtract """
+{
+  "author/dependency": "BSD-3-Clause"
+}"""
                         ]
         , test "should report an error if a dependency has a forbidden license" <|
             \() ->
@@ -148,6 +157,9 @@ all =
                                 , under = "author/dependency"
                                 }
                             ]
-                        , Review.Test.dataExtract """["BSD-3-Clause"]"""
+                        , Review.Test.dataExtract """
+{
+  "author/dependency": "BSD-3-Clause"
+}"""
                         ]
         ]
