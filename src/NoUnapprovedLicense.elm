@@ -26,9 +26,35 @@ import Set exposing (Set)
         ]
 
 If the license of a dependency is in the `allowed` list, the dependency will not be reported.
-If it's in the `forbidden`, the dependency will be reported as an error.
+If it's in the `forbidden` list, the dependency will be reported as an error.
 If it's in neither, the dependency will be reported but with a different message asking you
 to add the license to either list.
+
+
+## Usage as an insight rule
+
+If instead of enforcing a restriction on the licenses, you wish to have an overview of the licenses used in your project,
+you can run the rule as an insight rule (using `elm-review --report=json --extract`), which would yield an output like
+the following:
+
+```json
+{
+  "NoRedInk/elm-json-decode-pipeline": "BSD-3-Clause",
+  "elm-explorations/markdown": "BSD-3-Clause",
+  "elm-explorations/test": "BSD-3-Clause",
+  "elm/browser": "BSD-3-Clause",
+  "elm/core": "BSD-3-Clause",
+  "elm/html": "BSD-3-Clause",
+  "elm/http": "BSD-3-Clause",
+  "elm/json": "BSD-3-Clause",
+  "elm/parser": "BSD-3-Clause",
+  "elm/random": "BSD-3-Clause",
+  "elm/time": "BSD-3-Clause",
+  "elm/url": "BSD-3-Clause",
+  "elm/virtual-dom": "BSD-3-Clause",
+  "rtfeldman/elm-iso8601-date-strings": "BSD-3-Clause"
+}
+```
 
 -}
 rule : { allowed : List String, forbidden : List String } -> Rule
