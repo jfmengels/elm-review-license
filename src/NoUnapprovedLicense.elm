@@ -183,26 +183,27 @@ dataExtractor projectContext =
 
 findPackageNameInElmJson : String -> String -> Range
 findPackageNameInElmJson packageName elmJson =
-    elmJson
-        |> String.lines
-        |> List.indexedMap Tuple.pair
-        |> List.filterMap
-            (\( row, line ) ->
-                case String.indexes ("\"" ++ packageName ++ "\"") line of
-                    [] ->
-                        Nothing
+    findPackageNameInElmJsonHelp packageName (String.lines elmJson) 0
 
-                    column :: _ ->
-                        Just
-                            { start =
-                                { row = row + 1
-                                , column = column + 2
-                                }
-                            , end =
-                                { row = row + 1
-                                , column = column + String.length packageName + 2
-                                }
-                            }
-            )
-        |> List.head
-        |> Maybe.withDefault { start = { row = 1, column = 1 }, end = { row = 10000, column = 1 } }
+
+findPackageNameInElmJsonHelp : String -> List String -> Int -> Range
+findPackageNameInElmJsonHelp packageName lines row =
+    case lines of
+        [] ->
+            { start = { row = 1, column = 1 }, end = { row = 10000, column = 1 } }
+
+        line :: rest ->
+            case String.indexes ("\"" ++ packageName ++ "\"") line of
+                [] ->
+                    findPackageNameInElmJsonHelp packageName rest (row + 1)
+
+                column :: _ ->
+                    { start =
+                        { row = row + 1
+                        , column = column + 2
+                        }
+                    , end =
+                        { row = row + 1
+                        , column = column + String.length packageName + 2
+                        }
+                    }
