@@ -78,18 +78,17 @@ dependenciesVisitor dependencies projectContext =
     let
         licenses : Dict String String
         licenses =
-            dependencies
-                |> Dict.toList
-                |> List.filterMap
-                    (\( packageName, dependency ) ->
-                        case Dependency.elmJson dependency of
-                            Elm.Project.Package { license } ->
-                                Just ( packageName, Elm.License.toString license )
+            Dict.foldl
+                (\packageName dependency acc ->
+                    case Dependency.elmJson dependency of
+                        Elm.Project.Package { license } ->
+                            Dict.insert packageName (Elm.License.toString license) acc
 
-                            Elm.Project.Application _ ->
-                                Nothing
-                    )
-                |> Dict.fromList
+                        Elm.Project.Application _ ->
+                            acc
+                )
+                Dict.empty
+                dependencies
     in
     ( [], { projectContext | licenses = licenses } )
 
@@ -141,37 +140,37 @@ finalEvaluationForProject configuration projectContext =
                 forbidden : Set String
                 forbidden =
                     Set.fromList configuration.forbidden
-
-                unknownOrForbiddenLicenses : Dict String String
-                unknownOrForbiddenLicenses =
-                    projectContext.licenses
-                        |> Dict.filter (\_ license -> not <| Set.member license allowed)
             in
-            unknownOrForbiddenLicenses
-                |> Dict.toList
-                |> List.map
-                    (\( name, license ) ->
-                        if Set.member license forbidden then
-                            Rule.errorForElmJson elmJsonKey
-                                (\elmJson ->
-                                    { message = "Forbidden license `" ++ license ++ "` for dependency `" ++ name ++ "`"
-                                    , details = [ "This license has been marked as forbidden and you should therefore not use this package." ]
-                                    , range = findPackageNameInElmJson name elmJson
-                                    }
-                                )
+            Dict.foldl
+                (\name license acc ->
+                    if Set.member license allowed then
+                        acc
 
-                        else
-                            Rule.errorForElmJson elmJsonKey
-                                (\elmJson ->
-                                    { message = "Unknown license `" ++ license ++ "` for dependency `" ++ name ++ "`"
-                                    , details =
-                                        [ "Talk to your legal team and see if this license is allowed. If it is allowed, add it to the list of allowed licenses. Otherwise, add it to the list of forbidden licenses and remove this dependency."
-                                        , "More info about licenses at https://spdx.org/licenses."
-                                        ]
-                                    , range = findPackageNameInElmJson name elmJson
-                                    }
-                                )
-                    )
+                    else if Set.member license forbidden then
+                        Rule.errorForElmJson elmJsonKey
+                            (\elmJson ->
+                                { message = "Forbidden license `" ++ license ++ "` for dependency `" ++ name ++ "`"
+                                , details = [ "This license has been marked as forbidden and you should therefore not use this package." ]
+                                , range = findPackageNameInElmJson name elmJson
+                                }
+                            )
+                            :: acc
+
+                    else
+                        Rule.errorForElmJson elmJsonKey
+                            (\elmJson ->
+                                { message = "Unknown license `" ++ license ++ "` for dependency `" ++ name ++ "`"
+                                , details =
+                                    [ "Talk to your legal team and see if this license is allowed. If it is allowed, add it to the list of allowed licenses. Otherwise, add it to the list of forbidden licenses and remove this dependency."
+                                    , "More info about licenses at https://spdx.org/licenses."
+                                    ]
+                                , range = findPackageNameInElmJson name elmJson
+                                }
+                            )
+                            :: acc
+                )
+                []
+                projectContext.licenses
 
         Nothing ->
             []
