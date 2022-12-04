@@ -62,15 +62,14 @@ rule configuration =
     Rule.newProjectRuleSchema "NoUnapprovedLicense" initialProjectContext
         |> Rule.withElmJsonProjectVisitor elmJsonVisitor
         |> Rule.withDependenciesProjectVisitor dependenciesVisitor
-        |> Rule.withFinalProjectEvaluation (finalEvaluationForProject configuration)
+        |> Rule.withFinalProjectEvaluation
+            (finalEvaluationForProject
+                { allowed = Set.fromList configuration.allowed
+                , forbidden = Set.fromList configuration.forbidden
+                }
+            )
         |> Rule.withDataExtractor dataExtractor
         |> Rule.fromProjectRuleSchema
-
-
-type alias Configuration =
-    { allowed : List String
-    , forbidden : List String
-    }
 
 
 dependenciesVisitor : Dict String Dependency -> ProjectContext -> ( List nothing, ProjectContext )
@@ -128,19 +127,10 @@ initialProjectContext =
 -- FINAL EVALUATION
 
 
-finalEvaluationForProject : Configuration -> ProjectContext -> List (Error { useErrorForModule : () })
-finalEvaluationForProject configuration projectContext =
+finalEvaluationForProject : { allowed : Set String, forbidden : Set String } -> ProjectContext -> List (Error { useErrorForModule : () })
+finalEvaluationForProject { allowed, forbidden } projectContext =
     case projectContext.elmJsonKey of
         Just elmJsonKey ->
-            let
-                allowed : Set String
-                allowed =
-                    Set.fromList configuration.allowed
-
-                forbidden : Set String
-                forbidden =
-                    Set.fromList configuration.forbidden
-            in
             Dict.foldl
                 (\name license acc ->
                     if Set.member license allowed then
